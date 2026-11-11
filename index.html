@@ -1121,7 +1121,7 @@ function vProgram(){
   </div>
   <div class="label">Schedule</div><div class="card">
    <div class="setrow"><span>Current week</span><div class="wkstep"><button class="ib" data-act="wk-" aria-label="Previous week">−</button><b>Week ${wi.week}</b><button class="ib" data-act="wk+" aria-label="Next week">+</button></div></div>
-   <div class="setrow"><span>Lock-screen rest timer<small class="srsub">Copies your rest time for the Back Tap shortcut</small></span><div class="seg"><button data-act="clip" data-n="1" class="${p.clipRest?"on":""}">On</button><button data-act="clip" data-n="0" class="${p.clipRest?"":"on"}">Off</button></div></div>
+   <div class="setrow"><span>Lock-screen rest timer<small class="srsub">Copies your rest time for the Back Tap shortcut. The in-app timer still counts down, but your iPhone timer sounds the alarm.</small></span><div class="seg"><button data-act="clip" data-n="1" class="${p.clipRest?"on":""}">On</button><button data-act="clip" data-n="0" class="${p.clipRest?"":"on"}">Off</button></div></div>
    <div class="setrow"><span>Setup between exercises</span><div class="seg">${[2,3,4].map(m=>`<button data-act="setup" data-n="${m}" class="${(num(p.setupMin)||3)===m?"on":""}">${m}m</button>`).join("")}</div></div>
   </div><p class="note">Workouts alternate 1 → 2 → 1 → 2, picking up where you left off. Choose 2 or 3 workouts each week on the Workout tab, and move on to the next week whenever you're ready. Weeks never advance on their own, so time off (vacation, a sick kid) just picks up where you left off.</p>`;
   h+=`<div class="label">Phases</div><div class="card">`;
@@ -1321,7 +1321,7 @@ function tick(){
   const pt=document.getElementById("pauseT");if(pt&&D&&D.pausedAt)pt.textContent=mmss((Date.now()-D.pausedAt)/1000);
   if(S.restStart&&D&&!D.pausedAt){const sec=(Date.now()-S.restStart)/1000,goal=S.restGoal||D.rest||90;restEl.hidden=false;restT.textContent=mmss(sec);
     const up=sec>=goal;restEl.classList.toggle("up",up);restG.textContent=up?"· go!":"/ "+mmss(goal);
-    if(up&&!S.beeped){S.beeped=true;if(sec<goal+5)chime()}}
+    if(up&&!S.beeped){S.beeped=true;if(sec<goal+5&&!P().clipRest)chime()}} /* with the lock-screen timer on, the iPhone timer does the alarm */
   else restEl.hidden=true;
 }
 setInterval(tick,250);
