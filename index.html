@@ -877,7 +877,6 @@ function vWorkout(){
     }
     if(doneWk>=dpw)h+=`<div class="weekdone"><b>Week ${wi.week} done 💪</b><span>Start week ${wi.week%wi.tw+1} whenever you're ready — or it starts on its own in a few days.</span><button class="primary" data-act="nextweek">Start week ${wi.week%wi.tw+1} →</button></div>`;
     else h+=`<button class="ghost${S.armed==="nextweek"?" armed":""}" data-act="nextweek" style="margin:-4px 0 6px">${S.armed==="nextweek"?`Tap again to skip to week ${wi.week%wi.tw+1}`:`Move on to week ${wi.week%wi.tw+1} →`}</button>`;
-    h+=`<div class="swap"><span class="muted small">${doneWk>=dpw?"Extra session:":"Do a different one:"}</span>${W.map(w=>`<button class="pill" data-act="start" data-id="${esc(w.id)}">${esc(w.name)}</button>`).join("")}</div>`;
     h+=vLookahead(wi);
     return h;
   }
@@ -969,10 +968,9 @@ function vProgram(){
    ${vr!==cr?`<button class="primary" data-act="setround" data-i="${vr}" style="margin-top:4px">Train ${esc(roundName(vr))} now</button><p class="note" style="padding:0;margin:8px 2px 0">Switching keeps all your history, progress and badges. You stay in week ${weekInfo().week} and the same phase; only the exercises change.</p>`:`<p class="note" style="padding:0;margin:4px 2px 0">${manual?`You picked this program. <button class="linkbtn" data-act="autoround">Go back to auto-rotating</button> (switches every 10 weeks).`:"Programs rotate automatically every 10 weeks. Tap the other program to preview its exercises below."}</p>`}
   </div>
   <div class="label">Schedule</div><div class="card">
-   <div class="setrow"><span>Workouts per week</span><div class="seg"><button data-act="dpw" data-n="2" class="${num(p.daysPerWeek)!==3?"on":""}">2</button><button data-act="dpw" data-n="3" class="${num(p.daysPerWeek)===3?"on":""}">3</button></div></div>
    <div class="setrow"><span>Current week</span><div class="wkstep"><button class="ib" data-act="wk-" aria-label="Previous week">−</button><b>Week ${wi.week}</b><button class="ib" data-act="wk+" aria-label="Next week">+</button></div></div>
    <div class="setrow"><span>Setup between exercises</span><div class="seg">${[2,3,4].map(m=>`<button data-act="setup" data-n="${m}" class="${(num(p.setupMin)||3)===m?"on":""}">${m}m</button>`).join("")}</div></div>
-  </div><p class="note">Alternate Workout 1 and 2. On 3 days a week, the order rolls over: 1-2-1, then 2-1-2. The week advances on its own each week from your first workout.</p>`;
+  </div><p class="note">Workouts alternate 1 → 2 → 1 → 2, picking up where you left off. Choose 2 or 3 workouts each week on the Workout tab, and move on to the next week whenever you're ready — otherwise it advances on its own after 7 days.</p>`;
   h+=`<div class="label">Phases</div><div class="card">`;
   p.phases.forEach((ph,i)=>{
     h+=`<div class="phase"><div class="inl" style="margin-bottom:8px"><input class="field" style="font-weight:700" data-ph="name" data-i="${i}" value="${esc(ph.name)}" placeholder="Phase name">${p.phases.length>1?`<button class="ib x" data-act="rmphase" data-i="${i}" aria-label="Remove phase">✕</button>`:""}</div>
