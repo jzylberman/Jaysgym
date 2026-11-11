@@ -424,7 +424,7 @@ async function connect(){
 const P=()=>S.program;
 const totalWeeks=()=>P().phases.reduce((a,p)=>a+Math.max(1,num(p.weeks)),0)||1;
 function anchor(){const p=P();if(p.weekAnchor&&p.weekAnchor.at)return p.weekAnchor;return{raw:1,at:p.startDate?midnight(p.startDate):midnight(Date.now())}}
-function rawWeek(){const a=anchor();return a.raw+Math.max(0,Math.floor((Date.now()-a.at)/(7*DAY)))}
+function rawWeek(){return anchor().raw} /* weeks only move forward when you move them */
 const wkTarget=raw=>num((P().weekTargets||{})[raw])||num(P().daysPerWeek)||2;
 function advanceWeek(){const wi=weekInfo();P().weekAnchor={raw:wi.raw+1,at:Date.now()};saveProgram()}
 function weekAt(raw){const tw=totalWeeks(),cycle=Math.floor((raw-1)/tw)+1,week=((raw-1)%tw)+1;let acc=0,pi=0;for(let i=0;i<P().phases.length;i++){acc+=Math.max(1,num(P().phases[i].weeks));if(week<=acc){pi=i;break}}
@@ -860,9 +860,9 @@ function vWorkout(){
     const W=P().workouts;
     if(!W.length)return'<div class="empty">No workouts yet.<br><br><button class="pill" data-tab="program">Set up your program</button></div>';
     const dpw=wkTarget(wi.raw);
-    const doneWk=S.sessions.filter(s=>{const t=new Date(s.start).getTime();return t>=wi.wkStart&&t<wi.wkStart+7*DAY}).length;
+    const doneWk=S.sessions.filter(s=>{const t=new Date(s.start).getTime();return t>=wi.wkStart}).length;
     let dots="";for(let i=0;i<dpw;i++)dots+=`<i class="${i<doneWk?"on":""}"></i>`;
-    const wkS=S.sessions.filter(s=>{const t=new Date(s.start).getTime();return t>=wi.wkStart&&t<wi.wkStart+7*DAY}).sort((a,b)=>a.start.localeCompare(b.start));
+    const wkS=S.sessions.filter(s=>{const t=new Date(s.start).getTime();return t>=wi.wkStart}).sort((a,b)=>a.start.localeCompare(b.start));
     const rr=curRound();let h=roundBanner(roundName(rr),`Round ${wi.cycle} · Week ${wi.week} of ${wi.tw}`)+`<div class="hero"><h2>Phase ${wi.pi+1}: ${esc(ph.name)}</h2><p>${esc(ph.sets)} sets × ${esc(ph.reps)} reps · rest ${mmss(num(ph.rest))}</p>${ph.note?`<p style="margin-top:6px;font-size:13px;opacity:.95">${esc(ph.note)}</p>`:""}<div class="dots">${dots}</div><p style="margin-top:8px;font-size:13px">${Math.min(doneWk,dpw)} of ${dpw} workouts this week${doneWk>=dpw?" — nice work 💪":""}</p>
     <div class="wtgt"><span>This week:</span><button data-act="wkt" data-n="2" class="${dpw===2?"on":""}">2 workouts</button><button data-act="wkt" data-n="3" class="${dpw===3?"on":""}">3 workouts</button></div></div>`;
     h+=`<div class="label">This week · ${dpw} workouts</div>`;
@@ -875,7 +875,7 @@ function vWorkout(){
       const isNext=!nextShown;nextShown=true;const X=pwById(wi.pi,w.id),nm=blockText(X.exercises.filter(e=>e.name.trim())).join("  ·  ");
       h+=`<div class="daycard${isNext?" next":" later"}"><div style="min-width:0"><b>${esc(w.name)}${isNext?'<span class="badge">UP NEXT</span>':""}</b><span class="muted small">Session ${i+1} · ~${estMin(X,ph)} min${isNext&&calib().n?" (from your times)":""}</span>${isNext?`<div class="exlist">${esc(nm)}</div>`:""}${isNext?(()=>{const n=X.exercises.filter(e=>e.name.trim()&&(()=>{const g=suggestion(e.name,wi.pi);return g&&g.type==="up"})()).length;return n?`<div class="upchip">⬆ ${n} lift${n>1?"s":""} ready for more weight</div>`:""})():""}</div><div class="gobox"><button class="go" data-act="start" data-id="${esc(w.id)}">Start</button><button class="xgo" data-act="start" data-express="1" data-id="${esc(w.id)}">⚡ ${estMin(expressOf(X,wi.pi),ph)} min</button></div></div>`;
     }
-    if(doneWk>=dpw)h+=`<div class="weekdone"><b>Week ${wi.week} done 💪</b><span>Start week ${wi.week%wi.tw+1} whenever you're ready — or it starts on its own in a few days.</span><button class="primary" data-act="nextweek">Start week ${wi.week%wi.tw+1} →</button></div>`;
+    if(doneWk>=dpw)h+=`<div class="weekdone"><b>Week ${wi.week} done 💪</b><span>Take as long as you need — the program waits for you. Start week ${wi.week%wi.tw+1} when you're ready.</span><button class="primary" data-act="nextweek">Start week ${wi.week%wi.tw+1} →</button></div>`;
     else h+=`<button class="ghost${S.armed==="nextweek"?" armed":""}" data-act="nextweek" style="margin:-4px 0 6px">${S.armed==="nextweek"?`Tap again to skip to week ${wi.week%wi.tw+1}`:`Move on to week ${wi.week%wi.tw+1} →`}</button>`;
     h+=vLookahead(wi);
     return h;
@@ -970,7 +970,7 @@ function vProgram(){
   <div class="label">Schedule</div><div class="card">
    <div class="setrow"><span>Current week</span><div class="wkstep"><button class="ib" data-act="wk-" aria-label="Previous week">−</button><b>Week ${wi.week}</b><button class="ib" data-act="wk+" aria-label="Next week">+</button></div></div>
    <div class="setrow"><span>Setup between exercises</span><div class="seg">${[2,3,4].map(m=>`<button data-act="setup" data-n="${m}" class="${(num(p.setupMin)||3)===m?"on":""}">${m}m</button>`).join("")}</div></div>
-  </div><p class="note">Workouts alternate 1 → 2 → 1 → 2, picking up where you left off. Choose 2 or 3 workouts each week on the Workout tab, and move on to the next week whenever you're ready — otherwise it advances on its own after 7 days.</p>`;
+  </div><p class="note">Workouts alternate 1 → 2 → 1 → 2, picking up where you left off. Choose 2 or 3 workouts each week on the Workout tab, and move on to the next week whenever you're ready. Weeks never advance on their own, so time off (vacation, a sick kid) just picks up where you left off.</p>`;
   h+=`<div class="label">Phases</div><div class="card">`;
   p.phases.forEach((ph,i)=>{
     h+=`<div class="phase"><div class="inl" style="margin-bottom:8px"><input class="field" style="font-weight:700" data-ph="name" data-i="${i}" value="${esc(ph.name)}" placeholder="Phase name">${p.phases.length>1?`<button class="ib x" data-act="rmphase" data-i="${i}" aria-label="Remove phase">✕</button>`:""}</div>
@@ -1047,7 +1047,7 @@ document.addEventListener("click",ev=>{
     case"warmup":audioUnlock();beginDraft(D);D.warmEnd=Date.now()+300000;D.warmDone=false;D.warmChimed=false;saveDraft();render();window.scrollTo(0,0);break;
     case"warmdone":D.warmDone=true;saveDraft();render();window.scrollTo(0,0);break;
     case"wkt":{const wi=weekInfo();P().weekTargets=P().weekTargets||{};P().weekTargets[wi.raw]=+b.dataset.n;saveProgram();render();break}
-    case"nextweek":{const wi=weekInfo(),done=S.sessions.filter(s=>{const t=new Date(s.start).getTime();return t>=wi.wkStart&&t<wi.wkStart+7*DAY}).length;
+    case"nextweek":{const wi=weekInfo(),done=S.sessions.filter(s=>{const t=new Date(s.start).getTime();return t>=wi.wkStart}).length;
       if(done<wkTarget(wi.raw)&&S.armed!=="nextweek"){arm("nextweek");return}S.armed=null;advanceWeek();S.pv=null;render();window.scrollTo(0,0);const n=weekInfo();toast("Week "+n.week+" · "+n.phase.name+" started");break}
     case"pv":S.pv=+b.dataset.raw;render();break;
     case"begin":audioUnlock();beginDraft(D);saveDraft();render();window.scrollTo(0,0);break;
@@ -1172,6 +1172,7 @@ const cached=lsLoad();
 S.program=(cached&&validProg(cached.program))?cached.program:upgrade(cached&&cached.program);
 S.sessions=(cached&&Array.isArray(cached.sessions))?cached.sessions:[];
 S.draft=(cached&&cached.draft&&cached.draft.v===2)?cached.draft:null;
+if(S.program&&!S.program.weekAnchor&&S.program.startDate){const st=midnight(S.program.startDate),r=Math.max(1,Math.floor((midnight(Date.now())-st)/(7*DAY))+1);S.program.weekAnchor={raw:r,at:st+(r-1)*7*DAY};lsSave()}
 if(cached&&cached.body&&Array.isArray(cached.body.entries))S.body={heightIn:cached.body.heightIn||null,entries:cached.body.entries};
 render();
 connect();
