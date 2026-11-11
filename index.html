@@ -268,6 +268,7 @@ header{padding-top:10px;padding-bottom:8px}
 .wst>b{flex:none;width:34px;font-size:12px;color:#c26a00;padding-top:2px}
 .wst strong{display:block;font-size:14.5px}.wst span{font-size:13px;color:#55565e}
 .wst.on{background:#ffe9c7;opacity:1}.wst.past{opacity:.45}
+.backwk{margin:-8px 0 6px;font-size:14px}
 </style>
 </head>
 <body>
@@ -881,6 +882,7 @@ function vWorkout(){
     }
     if(doneWk>=dpw)h+=`<div class="weekdone"><b>Week ${wi.week} done 💪</b><span>Take as long as you need — the program waits for you. Start week ${wi.week%wi.tw+1} when you're ready.</span><button class="primary" data-act="nextweek">Start week ${wi.week%wi.tw+1} →</button></div>`;
     else h+=`<button class="ghost${S.armed==="nextweek"?" armed":""}" data-act="nextweek" style="margin:-4px 0 6px">${S.armed==="nextweek"?`Tap again to skip to week ${wi.week%wi.tw+1}`:`Move on to week ${wi.week%wi.tw+1} →`}</button>`;
+    if(wi.raw>1){const pw=weekAt(wi.raw-1);h+=`<button class="ghost backwk${S.armed==="prevweek"?" armed":""}" data-act="prevweek">${S.armed==="prevweek"?`Tap again to go back to week ${pw.week}`:`← Back to week ${pw.week} (${esc(pw.phase.name)})`}</button>`}
     h+=vLookahead(wi);
     return h;
   }
@@ -1053,6 +1055,7 @@ document.addEventListener("click",ev=>{
     case"wkt":{const wi=weekInfo();P().weekTargets=P().weekTargets||{};P().weekTargets[wi.raw]=+b.dataset.n;saveProgram();render();break}
     case"nextweek":{const wi=weekInfo(),done=S.sessions.filter(s=>{const t=new Date(s.start).getTime();return t>=wi.wkStart}).length;
       if(done<wkTarget(wi.raw)&&S.armed!=="nextweek"){arm("nextweek");return}S.armed=null;advanceWeek();S.pv=null;render();window.scrollTo(0,0);const n=weekInfo();toast("Week "+n.week+" · "+n.phase.name+" started");break}
+    case"prevweek":{if(S.armed!=="prevweek"){arm("prevweek");return}S.armed=null;shiftWeek(-1);S.pv=null;render();window.scrollTo(0,0);const n=weekInfo();toast("Back to week "+n.week+" · "+n.phase.name);break}
     case"pv":S.pv=+b.dataset.raw;render();break;
     case"begin":audioUnlock();beginDraft(D);saveDraft();render();window.scrollTo(0,0);break;
     case"notnow":S.draft=null;S.adding=false;saveDraft();render();window.scrollTo(0,0);break;
