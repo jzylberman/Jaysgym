@@ -269,6 +269,10 @@ header{padding-top:10px;padding-bottom:8px}
 .wst strong{display:block;font-size:14.5px}.wst span{font-size:13px;color:#55565e}
 .wst.on{background:#ffe9c7;opacity:1}.wst.past{opacity:.45}
 .backwk{margin:-8px 0 6px;font-size:14px}
+.latoggle{width:100%;display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin:16px 0 10px;text-align:left}
+.latoggle .laic{font-size:22px}.latoggle .latx{flex:1}.latoggle b{display:block;font-size:15.5px}.latoggle small{font-size:12.5px;color:var(--mut)}
+.latoggle .lachev{font-size:22px;color:var(--mut);transition:transform .15s}.latoggle.on .lachev{transform:rotate(90deg)}
+.latoggle.on{border-color:var(--acc)}
 </style>
 </head>
 <body>
@@ -836,8 +840,11 @@ function celebrate(title,lines){
   o.addEventListener("click",ev=>{if(ev.target.dataset.close||ev.target===o)o.remove()});document.body.appendChild(o);
 }
 
-function roundBanner(name,sub){const fs=Math.min(46,Math.round(300/(0.46*Math.max(6,name.length))));
-  return`<div class="roundban"><svg viewBox="0 0 320 78" role="img" aria-label="${esc(name)}"><g transform="rotate(-4 160 40)" font-family="Yellowtail,'Brush Script MT',cursive" font-size="${fs}" text-anchor="middle"><text x="163.5" y="${52+3.5}" fill="#1d2a4d" stroke="#1d2a4d" stroke-width="7" stroke-linejoin="round">${esc(name)}</text><text x="160" y="52" fill="#fff" stroke="#e5383b" stroke-width="6" stroke-linejoin="round" paint-order="stroke">${esc(name)}</text></g></svg><span>${esc(sub)}</span></div>`}
+function roundBanner(name,sub){const fs=Math.min(44,Math.round(290/(0.46*Math.max(6,name.length)))),w=Math.min(300,0.46*fs*name.length),x0=160-w/2,x1=160+w/2;
+  return`<div class="roundban"><svg viewBox="0 0 320 84" role="img" aria-label="${esc(name)}"><g transform="rotate(-3 160 40)"><g font-family="Yellowtail,'Brush Script MT',cursive" font-size="${fs}" text-anchor="middle"><text x="162.5" y="50.5" fill="#c4c6cd">${esc(name)}</text><text x="160" y="48" fill="#e5383b">${esc(name)}</text></g>
+  <path d="M${(x0-6).toFixed(1)} 62 C ${(x0+w*.25).toFixed(1)} 72, ${(x0+w*.5).toFixed(1)} 55, ${(x0+w*.72).toFixed(1)} 63 S ${(x1-4).toFixed(1)} 66, ${(x1+12).toFixed(1)} 56" fill="none" stroke="#e5383b" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M${(x0+10).toFixed(1)} 69 C ${(x0+w*.35).toFixed(1)} 74, ${(x0+w*.6).toFixed(1)} 64, ${(x1-18).toFixed(1)} 70" fill="none" stroke="#9a9ca5" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="1 5"/>
+  <circle cx="${(x1+15).toFixed(1)}" cy="53.5" r="2.6" fill="#9a9ca5"/></g></svg><span>${esc(sub)}</span></div>`}
 const WARM=[["Easy cardio","Jumping jacks, jog in place or bike — get a light sweat going"],["Upper body","Arm circles both ways, band pull-aparts or wall slides"],["Hips","Leg swings front-to-back and side-to-side, hip circles"],["Legs","10 slow bodyweight squats, 5 reverse lunges per side"],["Prime","10 push-ups (incline is fine) and a 30-second plank"]];
 function warmCard(D){const left=Math.max(0,(D.warmEnd-Date.now())/1000),m=Math.min(4,Math.floor((300-left)/60));
   return`<div class="warm"><div class="wtop"><b>🔥 Warm-up</b><span id="warmT">${left>0?mmss(left):"Done ✓"}</span></div>${WARM.map((x,i)=>`<div class="wst${i===m&&left>0?" on":i<m||left<=0?" past":""}" data-wi="${i}"><b>${i+1}:00</b><div><strong>${x[0]}</strong><span>${x[1]}</span></div></div>`).join("")}<button class="primary" data-act="warmdone" style="margin-top:8px">${left>0?"Done — start lifting":"Start lifting"}</button></div>`}
@@ -845,7 +852,10 @@ function warmCard(D){const left=Math.max(0,(D.warmEnd-Date.now())/1000),m=Math.m
 function vLookahead(wi){
   const max=wi.raw+wi.tw,sel=(S.pv&&S.pv>wi.raw&&S.pv<=max)?S.pv:wi.raw+1,A=weekAt(sel),ph=A.phase,W=P().workouts;
   let pills="";for(let r=wi.raw+1;r<=max;r++){const x=weekAt(r);pills+=`<button class="lap${r===sel?" on":""}" data-act="pv" data-raw="${r}"><b>Wk ${x.week}</b><span>${esc(x.phase.name)}</span>${x.week===1?`<em>${esc(roundName(x.r))}</em>`:""}</button>`}
-  let h=`<div class="label" style="margin-top:18px">Look ahead</div><div class="lapills">${pills}</div>`;
+  const open=!!S.laOpen;
+  let h=`<button class="latoggle${open?" on":""}" data-act="la"><span class="laic">🔭</span><span class="latx"><b>Look ahead</b><small>Preview upcoming weeks and phases</small></span><span class="lachev">›</span></button>`;
+  if(!open)return h;
+  h+=`<div class="lapills">${pills}</div>`;
   h+=`<div class="card lacard"><div class="lahead"><div><b>Week ${A.week} · ${esc(ph.name)}</b><span>${esc(roundName(A.r))}${A.cycle!==wi.cycle?" · next round":""}</span></div><div class="chips" style="margin:0"><span class="chip">${esc(ph.sets)} × ${esc(ph.reps)}</span><span class="chip g">Rest ${mmss(num(ph.rest))}</span></div></div>`;
   W.forEach(w=>{const X=pwById(A.pi,w.id,A.r),L=X.exercises.filter(e=>e.name.trim()),lb=labels(L);
     h+=`<div class="lawo"><div class="lawh"><b>${esc(w.name)}</b><span>~${estMin(X,ph)} min</span></div>`;
@@ -1056,6 +1066,7 @@ document.addEventListener("click",ev=>{
     case"nextweek":{const wi=weekInfo(),done=S.sessions.filter(s=>{const t=new Date(s.start).getTime();return t>=wi.wkStart}).length;
       if(done<wkTarget(wi.raw)&&S.armed!=="nextweek"){arm("nextweek");return}S.armed=null;advanceWeek();S.pv=null;render();window.scrollTo(0,0);const n=weekInfo();toast("Week "+n.week+" · "+n.phase.name+" started");break}
     case"prevweek":{if(S.armed!=="prevweek"){arm("prevweek");return}S.armed=null;shiftWeek(-1);S.pv=null;render();window.scrollTo(0,0);const n=weekInfo();toast("Back to week "+n.week+" · "+n.phase.name);break}
+    case"la":S.laOpen=!S.laOpen;render();break;
     case"pv":S.pv=+b.dataset.raw;render();break;
     case"begin":audioUnlock();beginDraft(D);saveDraft();render();window.scrollTo(0,0);break;
     case"notnow":S.draft=null;S.adding=false;saveDraft();render();window.scrollTo(0,0);break;
