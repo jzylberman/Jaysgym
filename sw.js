@@ -1,6 +1,6 @@
 /* JaysGym service worker: works offline, prefers the newest app version when online.
    Bump VERSION whenever you deploy an update. */
-const VERSION = "jaysgym-2026-11-11g";
+const VERSION = "jaysgym-2026-11-11h";
 const ASSETS = ["./", "index.html", "manifest.webmanifest", "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png"];
 const FONT_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com"];
 
