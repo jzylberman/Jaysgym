@@ -426,7 +426,7 @@ const totalWeeks=()=>P().phases.reduce((a,p)=>a+Math.max(1,num(p.weeks)),0)||1;
 function anchor(){const p=P();if(p.weekAnchor&&p.weekAnchor.at)return p.weekAnchor;return{raw:1,at:p.startDate?midnight(p.startDate):midnight(Date.now())}}
 function rawWeek(){return anchor().raw} /* weeks only move forward when you move them */
 const wkTarget=raw=>num((P().weekTargets||{})[raw])||num(P().daysPerWeek)||2;
-function advanceWeek(){const wi=weekInfo();P().weekAnchor={raw:wi.raw+1,at:Date.now()};saveProgram()}
+function advanceWeek(){const wi=weekInfo(),p=P();p.weekHist=(p.weekHist||[]).concat([{raw:wi.raw,at:wi.wkStart}]).slice(-60);p.weekAnchor={raw:wi.raw+1,at:Date.now()};saveProgram()}
 function weekAt(raw){const tw=totalWeeks(),cycle=Math.floor((raw-1)/tw)+1,week=((raw-1)%tw)+1;let acc=0,pi=0;for(let i=0;i<P().phases.length;i++){acc+=Math.max(1,num(P().phases[i].weeks));if(week<=acc){pi=i;break}}
   const o=P().activeRound,r=(o!=null&&o>=0&&o<nRounds())?o:(cycle-1)%nRounds();return{raw,week,cycle,pi,phase:P().phases[pi],r}}
 function weekInfo(){
@@ -436,7 +436,11 @@ function weekInfo(){
   const a=anchor(),wkStart=a.at+(raw-a.raw)*7*DAY;
   return{raw,week,cycle,tw,pi,phase:P().phases[pi],wkStart};
 }
-function shiftWeek(d){const wi=weekInfo();P().weekAnchor={raw:Math.max(1,wi.raw+d),at:wi.wkStart};saveProgram()}
+function shiftWeek(d){const wi=weekInfo(),p=P();if(d>0){advanceWeek();return}
+  const h=p.weekHist||[],last=h[h.length-1];
+  if(last&&last.raw===wi.raw-1){p.weekAnchor=h.pop();p.weekHist=h} /* go back: restore that week as it was, with its finished workouts */
+  else p.weekAnchor={raw:Math.max(1,wi.raw-1),at:wi.wkStart};
+  saveProgram()}
 const exSets=(e,ph)=>num(e.sets)||num(ph.sets)||3;
 const exReps=(e,ph)=>String(e.reps||ph.reps||"");
 const setupSec=()=>(num(P().setupMin)||3)*60;
