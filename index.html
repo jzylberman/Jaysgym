@@ -668,9 +668,13 @@ function sugBanner(e,ei){const g=e.sug;if(!g)return"";
   const up=g.type==="up";
   return`<div class="sug ${g.type}"><div class="sgic">${up?"⬆":"="}</div><div class="sgtx"><b>${up?(g.w?(e.sugApplied?"Weight bumped to "+fmtW(g.w)+" lb":"Ready to go up: try "+fmtW(g.w)+" lb"):"Ready to progress"):"Hold steady"}</b><span>${esc(g.msg)}</span></div>${up&&g.w&&!e.sugApplied?`<button class="sgbtn" data-act="sug" data-ei="${ei}">Use ${fmtW(g.w)}</button>`:""}</div>`}
 /* ---------- express workouts ---------- */
-function expressOf(W){const L=W.exercises.filter(e=>e.name.trim()),out=[];let blocks=0;
-  for(let i=0;i<L.length&&blocks<2;i++){const a=L[i];
-    if(a.ss&&L[i+1]){out.push(Object.assign({},a,{sets:2}),Object.assign({},L[i+1],{sets:2,ss:false}));i++}
+/* Express = main lift + first superset, 2 sets each. Shrugs are swapped for the phase's
+   pull-up/chin-up so every Express session covers legs, a push and a pull. */
+function expressOf(W,pi){if(pi==null)pi=weekInfo().pi;const L=W.exercises.filter(e=>e.name.trim()),out=[];let blocks=0;
+  let pull=null;const ph=P().phases[pi];((ph&&ph.workouts)||[]).forEach(w=>w.exercises.forEach(e=>{if(!pull&&/pull-?up|chin/i.test(e.name))pull=e}));
+  const sw=e=>(pull&&/shrug/i.test(e.name))?Object.assign({},pull,{id:pull.id,ss:e.ss}):e;
+  for(let i=0;i<L.length&&blocks<2;i++){const a=sw(L[i]);
+    if(a.ss&&L[i+1]){out.push(Object.assign({},a,{sets:2}),Object.assign({},sw(L[i+1]),{sets:2,ss:false}));i++}
     else out.push(Object.assign({},a,{sets:2,ss:false}));blocks++}
   return{id:W.id,exercises:out}}
 
@@ -771,7 +775,7 @@ function vWorkout(){
       const w=W[((wi.raw-1)*dpw+i)%W.length],done=wkS[i];
       if(done){h+=`<div class="daycard done"><div><b>${esc(done.dayName)}</b><span class="muted small">Session ${i+1} · Done ${fmtDate(done.start)}</span></div><span class="okmark">${CHECK}</span></div>`;continue}
       const isNext=!nextShown;nextShown=true;const X=pwById(wi.pi,w.id),nm=blockText(X.exercises.filter(e=>e.name.trim())).join("  ·  ");
-      h+=`<div class="daycard${isNext?" next":" later"}"><div style="min-width:0"><b>${esc(w.name)}${isNext?'<span class="badge">UP NEXT</span>':""}</b><span class="muted small">Session ${i+1} · ~${estMin(X,ph)} min${isNext&&calib().n?" (from your times)":""}</span>${isNext?`<div class="exlist">${esc(nm)}</div>`:""}${isNext?(()=>{const n=X.exercises.filter(e=>e.name.trim()&&(()=>{const g=suggestion(e.name,wi.pi);return g&&g.type==="up"})()).length;return n?`<div class="upchip">⬆ ${n} lift${n>1?"s":""} ready for more weight</div>`:""})():""}</div><div class="gobox"><button class="go" data-act="start" data-id="${esc(w.id)}">Start</button><button class="xgo" data-act="start" data-express="1" data-id="${esc(w.id)}">⚡ ${estMin(expressOf(X),ph)} min</button></div></div>`;
+      h+=`<div class="daycard${isNext?" next":" later"}"><div style="min-width:0"><b>${esc(w.name)}${isNext?'<span class="badge">UP NEXT</span>':""}</b><span class="muted small">Session ${i+1} · ~${estMin(X,ph)} min${isNext&&calib().n?" (from your times)":""}</span>${isNext?`<div class="exlist">${esc(nm)}</div>`:""}${isNext?(()=>{const n=X.exercises.filter(e=>e.name.trim()&&(()=>{const g=suggestion(e.name,wi.pi);return g&&g.type==="up"})()).length;return n?`<div class="upchip">⬆ ${n} lift${n>1?"s":""} ready for more weight</div>`:""})():""}</div><div class="gobox"><button class="go" data-act="start" data-id="${esc(w.id)}">Start</button><button class="xgo" data-act="start" data-express="1" data-id="${esc(w.id)}">⚡ ${estMin(expressOf(X,wi.pi),ph)} min</button></div></div>`;
     }
     if(doneWk>=dpw)h+=`<p class="note" style="text-align:center;margin:4px 0 12px">Week done! Rest up — next week starts automatically.</p>`;
     h+=`<div class="swap"><span class="muted small">${doneWk>=dpw?"Extra session:":"Do a different one:"}</span>${W.map(w=>`<button class="pill" data-act="start" data-id="${esc(w.id)}">${esc(w.name)}</button>`).join("")}</div>`;
@@ -932,8 +936,8 @@ document.addEventListener("click",ev=>{
       if(!p.startDate){p.startDate=new Date(midnight(Date.now())).toISOString();saveProgram()}
       const wi=weekInfo(),ph=wi.phase;
       S.draft={v:2,id:uid(),dayId:w.id,dayName:w.name,start:new Date().toISOString(),week:wi.week,phase:wi.pi,phaseName:ph.name,rest:num(ph.rest)||90,
-        note:ph.note||"",express:!!b.dataset.express,exercises:(b.dataset.express?expressOf(pwById(wi.pi,w.id)):pwById(wi.pi,w.id)).exercises.filter(x=>x.name.trim()).map(x=>mkEx(x.name,exReps(x,ph),exSets(x,ph),num(x.inc),x.ss,wi.pi,x.id))};
-      S.draft.start=null;S.draft.pausedMs=0;S.draft.pausedAt=null;S.draft.est=Math.round(estRaw(b.dataset.express?expressOf(pwById(wi.pi,w.id)):pwById(wi.pi,w.id),ph)*10)/10;
+        note:ph.note||"",express:!!b.dataset.express,exercises:(b.dataset.express?expressOf(pwById(wi.pi,w.id),wi.pi):pwById(wi.pi,w.id)).exercises.filter(x=>x.name.trim()).map(x=>mkEx(x.name,exReps(x,ph),exSets(x,ph),num(x.inc),x.ss,wi.pi,x.id))};
+      S.draft.start=null;S.draft.pausedMs=0;S.draft.pausedAt=null;S.draft.est=Math.round(estRaw(b.dataset.express?expressOf(pwById(wi.pi,w.id),wi.pi):pwById(wi.pi,w.id),ph)*10)/10;
       addWarmups(S.draft.exercises[0],b.dataset.express?1:wuCount(ph));
       saveDraft();render();window.scrollTo(0,0);break}
     case"begin":audioUnlock();beginDraft(D);saveDraft();render();window.scrollTo(0,0);break;
