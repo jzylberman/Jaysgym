@@ -235,6 +235,10 @@ header{padding-top:10px;padding-bottom:8px}
 .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:1}
 .confetti i{position:absolute;top:-12px;width:8px;height:14px;border-radius:2px;animation:fall 2.6s ease-in forwards}
 @keyframes fall{to{top:105%;transform:translateX(30px) rotate(540deg)}}
+.roundban{text-align:center;margin:-4px 0 6px}
+.roundban svg{width:100%;max-width:330px;height:auto;display:block;margin:0 auto;overflow:visible}
+.roundban span{display:block;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-top:-2px}
+.rseg{margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -283,8 +287,8 @@ const DEFAULT={v:4,daysPerWeek:2,startDate:null,
    {id:"w1",exercises:[ex("Back Squat",5),ex("Chest-Supported DB Row",5,SS),ex("Incline DB Press",5),ex("Chin-up (band-assisted if needed)",5,{reps:"8-12",ss:true}),ex("Plank",5,{sets:3,reps:"30-45s"}),ex("Dip",5,{sets:3,reps:"10-15",ss:true}),ex("DB Curl",5,{sets:3})]},
    {id:"w2",exercises:[ex("Barbell Hip Thrust",10),ex("Landmine Press",5,SS),ex("DB Shrug",5),ex("DB Reverse Lunge (reps per leg)",5,SS),ex("Decline Sit-up",5,{sets:3}),ex("DB Skull Crusher",5,{sets:3,ss:true}),ex("Incline DB Curl",5,{sets:3})]}]},
   {name:"Build",weeks:3,sets:4,reps:"8-10",rest:75,note:"Add weight when you hit the top of the rep range. Leave 1–2 reps in the tank.",workouts:[
-   {id:"w1",exercises:[ex("Back Squat",5),ex("Barbell Row",5,SS),ex("Incline DB Press",5),ex("Pull-up",5,SS),ex("Plank",5,{sets:3,reps:"45-60s"}),ex("Dip",5,{sets:3,ss:true}),ex("DB Curl",5,{sets:3})]},
-   {id:"w2",exercises:[ex("Romanian Deadlift",10),ex("Overhead DB Press",5,SS),ex("DB Shrug",5),ex("DB Walking Lunge (reps per leg)",5,SS),ex("Hanging Leg Raise",5,{sets:3,reps:"10-15"}),ex("Close-Grip Bench Press",5,{sets:3,ss:true}),ex("DB Hammer Curl",5,{sets:3})]}]},
+   {id:"w1",exercises:[ex("Back Squat",5),ex("Barbell Row",5,SS),ex("Incline DB Press",5),ex("Pull-up",5,SS),ex("Plank",5,{sets:3,reps:"45-60s"}),ex("Dip",5,{sets:2,ss:true}),ex("DB Curl",5,{sets:2})]},
+   {id:"w2",exercises:[ex("Romanian Deadlift",10),ex("Overhead DB Press",5,SS),ex("DB Shrug",5),ex("DB Walking Lunge (reps per leg)",5,SS),ex("Hanging Leg Raise",5,{sets:3,reps:"10-15"}),ex("Close-Grip Bench Press",5,{sets:2,ss:true}),ex("DB Hammer Curl",5,{sets:2})]}]},
   {name:"Strength",weeks:3,sets:4,reps:"3-5",rest:120,note:"Heavy. Do 2–3 lighter warm-up sets first and keep every rep clean.",workouts:[
    {id:"w1",exercises:[ex("Back Squat",5),ex("Barbell Row",5,{reps:"6-8",ss:true}),ex("Incline Barbell Bench Press",5),ex("Weighted Pull-up",5,SS),ex("Landmine Rotation (reps per side)",5,{sets:3,reps:"8-10"})]},
    {id:"w2",exercises:[ex("Deadlift",10),ex("Standing Barbell Overhead Press",5,SS),ex("Barbell Shrug",10,{reps:"6-8"}),ex("DB Bulgarian Split Squat (reps per leg)",5,{reps:"6-8",ss:true}),ex("Hanging Leg Raise",5,{sets:3,reps:"10-15"})]}]},
@@ -292,9 +296,21 @@ const DEFAULT={v:4,daysPerWeek:2,startDate:null,
    {id:"w1",exercises:[ex("Back Squat",5),ex("Barbell Row",5,SS),ex("Incline DB Press",5),ex("Pull-up",5,SS),ex("Plank",5,{reps:"30-45s"})]},
    {id:"w2",exercises:[ex("Romanian Deadlift",10),ex("Overhead DB Press",5,SS),ex("DB Shrug",5),ex("DB Walking Lunge (reps per leg)",5,SS),ex("Hanging Leg Raise",5,{reps:"10-15"})]}]}
  ]};
-const fresh=()=>JSON.parse(JSON.stringify(DEFAULT));
+/* Round 2: "The Works Part Deux" — same structure and phases, new variations */
+const ROUND2=()=>[
+ [{id:"w1",exercises:[ex("Front Squat",5,{reps:"10-12"}),ex("Landmine Row",5,SS),ex("Flat DB Bench Press",5),ex("Neutral-Grip Pull-up (band if needed)",5,{reps:"8-12",ss:true}),ex("Side Plank (per side)",5,{sets:3,reps:"30-40s"}),ex("Dip",5,{sets:3,reps:"10-15",ss:true}),ex("DB Hammer Curl",5,{sets:3})]},
+  {id:"w2",exercises:[ex("DB Romanian Deadlift",5),ex("Seated DB Shoulder Press",5,SS),ex("DB Shrug",5),ex("DB Step-Up (reps per leg)",5,SS),ex("Hanging Knee Raise",5,{sets:3}),ex("Overhead DB Triceps Extension",5,{sets:3,ss:true}),ex("Barbell Curl",5,{sets:3})]}],
+ [{id:"w1",exercises:[ex("Front Squat",5),ex("Pendlay Row",5,SS),ex("Incline Barbell Bench Press",5),ex("Chin-up",5,SS),ex("Long-Lever Plank",5,{sets:3,reps:"30-45s"}),ex("Dip",5,{sets:2,ss:true}),ex("Incline DB Curl",5,{sets:2})]},
+  {id:"w2",exercises:[ex("Barbell Hip Thrust",10),ex("Arnold Press",5,SS),ex("Barbell Shrug",10),ex("Front-Foot-Elevated Split Squat (reps per leg)",5,SS),ex("Hanging Leg Raise",5,{sets:3,reps:"10-15"}),ex("Close-Grip Bench Press",5,{sets:2,ss:true}),ex("Barbell Curl",5,{sets:2})]}],
+ [{id:"w1",exercises:[ex("Paused Back Squat",5),ex("Pendlay Row",5,{reps:"6-8",ss:true}),ex("Paused Bench Press",5),ex("Weighted Chin-up",5,SS),ex("Weighted Plank",5,{sets:3,reps:"30-45s"})]},
+  {id:"w2",exercises:[ex("Sumo Deadlift",10),ex("Push Press",5,SS),ex("Barbell Shrug",10,{reps:"6-8"}),ex("Heavy DB Walking Lunge (reps per leg)",5,{reps:"6-8",ss:true}),ex("Hanging Leg Raise",5,{sets:3,reps:"10-15"})]}],
+ [{id:"w1",exercises:[ex("Front Squat",5),ex("Pendlay Row",5,SS),ex("Incline Barbell Bench Press",5),ex("Chin-up",5,SS),ex("Long-Lever Plank",5,{reps:"30-45s"})]},
+  {id:"w2",exercises:[ex("Barbell Hip Thrust",10),ex("Arnold Press",5,SS),ex("Barbell Shrug",10),ex("Front-Foot-Elevated Split Squat (reps per leg)",5,SS),ex("Hanging Leg Raise",5,{reps:"10-15"})]}]
+];
+const ROUND_NAMES=["The Works","The Works Part Deux"];
+const fresh=()=>{const p=JSON.parse(JSON.stringify(DEFAULT));p.v=5;p.roundNames=ROUND_NAMES.slice();ROUND2().forEach((ws,i)=>{if(p.phases[i])p.phases[i].workouts2=ws});return p};
 
-const S={body:{heightIn:null,entries:[]},pOpen:null,edit:null,ep:null,demo:{},program:null,sessions:[],draft:null,tab:"workout",open:{},adding:false,restStart:null,armed:null};
+const S={er:null,body:{heightIn:null,entries:[]},pOpen:null,edit:null,ep:null,demo:{},program:null,sessions:[],draft:null,tab:"workout",open:{},adding:false,restStart:null,armed:null};
 
 /* ---------- storage: account sync (db) + on-device cache ---------- */
 const LS="liftlog.v1";
@@ -318,8 +334,10 @@ const saveProgram=()=>put("program",Object.assign({key:"program",type:"program"}
 const saveDraft=()=>put("draft",S.draft?{key:"draft",type:"draft",session:S.draft}:null);
 const saveSession=s=>put("s_"+s.id,Object.assign({key:"s_"+s.id,type:"session"},s));
 const delSession=id=>put("s_"+id,null);
-const validProg=p=>p&&p.v===4&&Array.isArray(p.workouts)&&Array.isArray(p.phases);
-function upgrade(old){const n=fresh();if(old&&old.startDate)n.startDate=old.startDate;if(old&&old.daysPerWeek)n.daysPerWeek=old.daysPerWeek;return n}
+const validProg=p=>p&&p.v===5&&Array.isArray(p.workouts)&&Array.isArray(p.phases);
+function upgrade(old){
+  if(old&&old.v===4&&Array.isArray(old.phases)){/* keep your edits, add round 2 */const p=JSON.parse(JSON.stringify(old));p.v=5;p.roundNames=ROUND_NAMES.slice();const R=ROUND2();p.phases.forEach((ph,i)=>{if(!ph.workouts2)ph.workouts2=R[i]||JSON.parse(JSON.stringify(ph.workouts||[]))});if(p.phases[1])(p.phases[1].workouts||[]).forEach(w=>w.exercises.forEach(e=>{if(/^(dip|db curl|db hammer curl|close-grip bench press)$/i.test(e.name.trim())&&num(e.sets)===3)e.sets=2}));return p}
+  const n=fresh();if(old&&old.startDate)n.startDate=old.startDate;if(old&&old.daysPerWeek)n.daysPerWeek=old.daysPerWeek;return n}
 
 /* render the retro logo with the web font so it can be packaged as the home-screen icon */
 const LOGO_VER="retro2";
@@ -405,8 +423,13 @@ const estNote=()=>{const c=calib();return c.n?"based on your last "+(c.n===1?"wo
 function activeSec(D,now){if(!D||!D.start)return 0;now=now||Date.now();let p=num(D.pausedMs);if(D.pausedAt)p+=now-D.pausedAt;return Math.max(0,(now-new Date(D.start).getTime()-p)/1000)}
 
 /* ---------- helpers ---------- */
-function pwById(pi,id){const ph=P().phases[pi];if(!ph)return{id,exercises:[]};if(!Array.isArray(ph.workouts))ph.workouts=[];let x=ph.workouts.find(w=>w.id===id);if(!x){x={id,exercises:[]};ph.workouts.push(x)}return x}
-const pw=(pi,di)=>pwById(pi,P().workouts[di].id);
+const nRounds=()=>Math.max(1,(P().roundNames||[]).length);
+const curRound=()=>(weekInfo().cycle-1)%nRounds();
+const roundName=r=>(P().roundNames||[])[r]||("Round "+(r+1));
+const wkey=r=>r?"workouts"+(r+1):"workouts";
+const eri=()=>(S.er!=null&&S.er<nRounds())?S.er:curRound();
+function pwById(pi,id,r){if(r==null)r=curRound();const ph=P().phases[pi];if(!ph)return{id,exercises:[]};const k=wkey(r);if(!Array.isArray(ph[k]))ph[k]=JSON.parse(JSON.stringify(ph.workouts||[]));let x=ph[k].find(w=>w.id===id);if(!x){x={id,exercises:[]};ph[k].push(x)}return x}
+const pw=(pi,di)=>pwById(pi,P().workouts[di].id,eri());
 const epi=()=>{const n=P().phases.length;return(S.ep!=null&&S.ep<n)?S.ep:weekInfo().pi};
 function labels(L){const out=[];let b=0;for(let i=0;i<L.length;i++){const c=String.fromCharCode(65+(b%26));if(L[i].ss&&L[i+1]){out[i]=c+"1";out[i+1]=c+"2";i++}else out[i]=c;b++}return out}
 function blockText(L){const lb=labels(L),parts=[];for(let i=0;i<L.length;i++){const n=L[i].name.replace(/\s*\(.*\)/,"");if(L[i].ss&&L[i+1]){parts.push(n+" + "+L[i+1].name.replace(/\s*\(.*\)/,""));i++}else parts.push(n)}return parts}
@@ -494,7 +517,17 @@ Object.assign(DEMOS,{
  closegrip:{anim:"incline",cues:["Flat bench, hands just inside shoulder-width","Lower the bar to your lower chest, elbows tucked close","Press up by locking out with your triceps — wrists stacked over elbows"]},
  skull:{eq:"db",props:[[30,94,100,94],[38,94,38,110],[92,94,92,110]],A:{hip:[85,88],t:-90,a1:[0,0],l1:[95,175]},B:{hip:[85,88],t:-90,a1:[-15,-112],l1:[95,175]},cues:["Lie on a flat bench, dumbbells straight up over your shoulders","Bend only at the elbows, lowering the weights beside your head","Keep elbows pointed up and in; extend back up and squeeze"]}
 });
-function demoKey(name){const n=name.toLowerCase();if(/incline.*curl/.test(n))return"inclinecurl";if(/chest-supported/.test(n))return"csrow";if(/close-grip/.test(n))return"closegrip";if(/skull/.test(n))return"skull";
+Object.assign(DEMOS,{
+ frontsquat:{anim:"squat",cues:["Bar rests on the front of your shoulders, elbows high","Brace hard, stay upright and sit straight down","Drive up keeping the elbows high so the bar doesn't roll forward"]},
+ lmrow:{anim:"row",cues:["Straddle the bar, hinge to about 45° with a flat back","Grip the bar right under the plates (or with a V-handle) and row to your chest","Squeeze your shoulder blades, lower under control"]},
+ flatbench:{anim:"incline",cues:["Flat bench, shoulder blades pinched, feet planted","Lower to mid-chest with elbows about 45° from your body","Paused reps: hold 1 second on the chest, then press — no bounce"]},
+ stepup:{anim:"lunge",cues:["Use a bench about knee height, dumbbells at your sides","Drive through the heel of the top foot — don't push off the bottom leg","Step down slowly; finish all reps on one leg, then switch"]},
+ ohtri:{anim:null,cues:["Hold one dumbbell overhead with both hands, elbows pointing up","Lower it behind your head until you feel a deep triceps stretch","Extend back up without flaring elbows or arching your back"]},
+ arnold:{anim:"ohp",cues:["Start with dumbbells at your chin, palms facing you","Rotate your palms forward as you press overhead","Reverse the rotation on the way down — slow and controlled"]},
+ pushpress:{anim:"ohp",cues:["Bar on your shoulders, feet hip-width","Quick dip at the knees, then drive up with your legs and press","Lock out overhead, lower back to your shoulders under control"]},
+ sideplank:{anim:"plank",cues:["Elbow under shoulder, body in one straight line","Lift your hips and squeeze glutes — don't let them sag","Hold the time on one side, then switch"]}
+});
+function demoKey(name){const n=name.toLowerCase();if(/front squat/.test(n))return"frontsquat";if(/landmine row/.test(n))return"lmrow";if(/step-?up/.test(n))return"stepup";if(/overhead.*tricep|tricep.*extension/.test(n))return"ohtri";if(/arnold/.test(n))return"arnold";if(/push press/.test(n))return"pushpress";if(/side plank/.test(n))return"sideplank";if(/bench/.test(n)&&!/incline|close-grip/.test(n))return"flatbench";if(/incline.*curl/.test(n))return"inclinecurl";if(/chest-supported/.test(n))return"csrow";if(/close-grip/.test(n))return"closegrip";if(/skull/.test(n))return"skull";
   if(/lunge|split squat/.test(n))return"lunge";if(/goblet/.test(n))return"goblet";if(/squat/.test(n))return"squat";
   if(/hip thrust|glute bridge/.test(n))return"hipthrust";if(/deadlift|rdl/.test(n))return"deadlift";
   if(/cable row|seated row/.test(n))return"cablerow";if(/row/.test(n))return"row";
@@ -563,7 +596,7 @@ function exHistory(name){
 }
 function progInfo(name,pi){
   const k=nameKey(name),ph=P().phases[pi];
-  const find=(phx)=>{for(const w of (phx&&phx.workouts)||[]){const x=w.exercises.find(e=>nameKey(e.name)===k);if(x)return{inc:num(x.inc)||5,reps:exReps(x,phx)}}return null};
+  const find=(phx)=>{for(const w of ((phx&&phx.workouts)||[]).concat((phx&&phx.workouts2)||[])){const x=w.exercises.find(e=>nameKey(e.name)===k);if(x)return{inc:num(x.inc)||5,reps:exReps(x,phx)}}return null};
   return find(ph)||P().phases.map(find).find(Boolean)||{inc:5,reps:ph?ph.reps:"8-10"};
 }
 function suggestion(name,pi){
@@ -671,7 +704,7 @@ function sugBanner(e,ei){const g=e.sug;if(!g)return"";
 /* Express = main lift + first superset, 2 sets each. Shrugs are swapped for the phase's
    pull-up/chin-up so every Express session covers legs, a push and a pull. */
 function expressOf(W,pi){if(pi==null)pi=weekInfo().pi;const L=W.exercises.filter(e=>e.name.trim()),out=[];let blocks=0;
-  let pull=null;const ph=P().phases[pi];((ph&&ph.workouts)||[]).forEach(w=>w.exercises.forEach(e=>{if(!pull&&/pull-?up|chin/i.test(e.name))pull=e}));
+  let pull=null;const ph=P().phases[pi];((ph&&(ph[wkey(curRound())]||ph.workouts))||[]).forEach(w=>w.exercises.forEach(e=>{if(!pull&&/pull-?up|chin/i.test(e.name))pull=e}));
   const sw=e=>(pull&&/shrug/i.test(e.name))?Object.assign({},pull,{id:pull.id,ss:e.ss}):e;
   for(let i=0;i<L.length&&blocks<2;i++){const a=sw(L[i]);
     if(a.ss&&L[i+1]){out.push(Object.assign({},a,{sets:2}),Object.assign({},sw(L[i+1]),{sets:2,ss:false}));i++}
@@ -755,6 +788,8 @@ function celebrate(title,lines){
   o.addEventListener("click",ev=>{if(ev.target.dataset.close||ev.target===o)o.remove()});document.body.appendChild(o);
 }
 
+function roundBanner(name,sub){const fs=Math.min(46,Math.round(300/(0.46*Math.max(6,name.length))));
+  return`<div class="roundban"><svg viewBox="0 0 320 78" role="img" aria-label="${esc(name)}"><g transform="rotate(-4 160 40)" font-family="Yellowtail,'Brush Script MT',cursive" font-size="${fs}" text-anchor="middle"><text x="163.5" y="${52+3.5}" fill="#1d2a4d" stroke="#1d2a4d" stroke-width="7" stroke-linejoin="round">${esc(name)}</text><text x="160" y="52" fill="#fff" stroke="#e5383b" stroke-width="6" stroke-linejoin="round" paint-order="stroke">${esc(name)}</text></g></svg><span>${esc(sub)}</span></div>`}
 /* ---------- views ---------- */
 const view=document.getElementById("view");
 const CHECK='<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
@@ -768,7 +803,7 @@ function vWorkout(){
     const doneWk=S.sessions.filter(s=>{const t=new Date(s.start).getTime();return t>=wi.wkStart&&t<wi.wkStart+7*DAY}).length;
     let dots="";for(let i=0;i<dpw;i++)dots+=`<i class="${i<doneWk?"on":""}"></i>`;
     const wkS=S.sessions.filter(s=>{const t=new Date(s.start).getTime();return t>=wi.wkStart&&t<wi.wkStart+7*DAY}).sort((a,b)=>a.start.localeCompare(b.start));
-    let h=`<div class="hero"><div class="wk">Week ${wi.week} of ${wi.tw}${wi.cycle>1?" · Round "+wi.cycle:""}</div><h2>Phase ${wi.pi+1}: ${esc(ph.name)}</h2><p>${esc(ph.sets)} sets × ${esc(ph.reps)} reps · rest ${mmss(num(ph.rest))}</p>${ph.note?`<p style="margin-top:6px;font-size:13px;opacity:.95">${esc(ph.note)}</p>`:""}<div class="dots">${dots}</div><p style="margin-top:8px;font-size:13px">${Math.min(doneWk,dpw)} of ${dpw} workouts this week${doneWk>=dpw?" — nice work 💪":""}</p></div>`;
+    const rr=curRound();let h=roundBanner(roundName(rr),`Round ${wi.cycle} · Week ${wi.week} of ${wi.tw}`)+`<div class="hero"><h2>Phase ${wi.pi+1}: ${esc(ph.name)}</h2><p>${esc(ph.sets)} sets × ${esc(ph.reps)} reps · rest ${mmss(num(ph.rest))}</p>${ph.note?`<p style="margin-top:6px;font-size:13px;opacity:.95">${esc(ph.note)}</p>`:""}<div class="dots">${dots}</div><p style="margin-top:8px;font-size:13px">${Math.min(doneWk,dpw)} of ${dpw} workouts this week${doneWk>=dpw?" — nice work 💪":""}</p></div>`;
     h+=`<div class="label">This week · ${dpw} workouts</div>`;
     let nextShown=false;
     for(let i=0;i<dpw;i++){
@@ -873,7 +908,7 @@ function vProgram(){
     <div class="pnums"><label>Weeks<input class="field" data-ph="weeks" data-i="${i}" inputmode="numeric" value="${esc(ph.weeks)}"></label><label>Sets<input class="field" data-ph="sets" data-i="${i}" inputmode="numeric" value="${esc(ph.sets)}"></label><label>Reps<input class="field w" data-ph="reps" data-i="${i}" value="${esc(ph.reps)}"></label><label>Rest s<input class="field" data-ph="rest" data-i="${i}" inputmode="numeric" value="${esc(ph.rest)}"></label><label>Warm-up<input class="field" data-ph="warmup" data-i="${i}" inputmode="numeric" value="${wuCount(ph)}"></label></div><input class="field" style="width:100%;margin-top:8px;font-size:14px" data-ph="note" data-i="${i}" value="${esc(ph.note||"")}" placeholder="Coaching note (optional)"></div>`});
   h+=`<button class="pill" data-act="addphase" style="margin-top:6px">+ Phase</button></div>`;
   const ep=epi(),EP=p.phases[ep];
-  h+=`<div class="label">Workouts by phase</div><div class="seg phseg">${p.phases.map((x,i)=>`<button data-act="ep" data-i="${i}" class="${i===ep?"on":""}">${esc(x.name||"Phase "+(i+1))}</button>`).join("")}</div>`;
+  const er=eri();h+=`<div class="label">Workouts by round & phase</div><div class="seg phseg rseg">${Array.from({length:nRounds()},(_,r)=>`<button data-act="er" data-i="${r}" class="${r===er?"on":""}">${esc(roundName(r))}${r===curRound()?" •":""}</button>`).join("")}</div><div class="seg phseg">${p.phases.map((x,i)=>`<button data-act="ep" data-i="${i}" class="${i===ep?"on":""}">${esc(x.name||"Phase "+(i+1))}</button>`).join("")}</div>`;
   p.workouts.forEach((w0,di)=>{const w=pw(ep,di);
     h+=`<div class="card"><div class="pday"><input class="field" data-pf="wname" data-di="${di}" value="${esc(w0.name)}" placeholder="Workout name"><button class="ib x${S.armed==="day"+di?" armed":""}" data-act="rmday" data-di="${di}" aria-label="Delete workout">${S.armed==="day"+di?"Sure?":"✕"}</button></div><div class="muted small" style="margin:0 2px 4px">~${estMin(w,EP)} min in ${esc(EP.name)}${ep===wi.pi?" (current phase)":""}</div>`;
     const plb=labels(w.exercises);
@@ -907,7 +942,7 @@ function render(){
 }
 function toast(t){const d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2600)}
 function arm(k){S.armed=k;clearTimeout(arm.t);arm.t=setTimeout(()=>{if(S.armed===k){S.armed=null;render()}},3000);render()}
-function draftEst(D){if(D.est)return Math.round(D.est*calib().r);const ph=P().phases[D.phase];if(!ph)return 0;const w=(ph.workouts||[]).find(x=>x.id===D.dayId);return w?estMin(w,ph):0}
+function draftEst(D){if(D.est)return Math.round(D.est*calib().r);const ph=P().phases[D.phase];if(!ph)return 0;const w=pwById(D.phase,D.dayId,D.round||0);return w?estMin(w,ph):0}
 function beginDraft(D){if(D.start)return;D.start=new Date().toISOString();D.pausedMs=0;D.pausedAt=null;wakeOn()}
 function updProg(){const D=S.draft;const b=document.getElementById("progbar");if(!D||!b)return;const t=allsets(D),d=D.exercises.reduce((a,e)=>a+e.sets.filter(s=>s.done).length,0);b.style.width=(t?d/t*100:0)+"%"}
 
@@ -936,7 +971,7 @@ document.addEventListener("click",ev=>{
       if(!p.startDate){p.startDate=new Date(midnight(Date.now())).toISOString();saveProgram()}
       const wi=weekInfo(),ph=wi.phase;
       S.draft={v:2,id:uid(),dayId:w.id,dayName:w.name,start:new Date().toISOString(),week:wi.week,phase:wi.pi,phaseName:ph.name,rest:num(ph.rest)||90,
-        note:ph.note||"",express:!!b.dataset.express,exercises:(b.dataset.express?expressOf(pwById(wi.pi,w.id),wi.pi):pwById(wi.pi,w.id)).exercises.filter(x=>x.name.trim()).map(x=>mkEx(x.name,exReps(x,ph),exSets(x,ph),num(x.inc),x.ss,wi.pi,x.id))};
+        note:ph.note||"",round:curRound(),express:!!b.dataset.express,exercises:(b.dataset.express?expressOf(pwById(wi.pi,w.id),wi.pi):pwById(wi.pi,w.id)).exercises.filter(x=>x.name.trim()).map(x=>mkEx(x.name,exReps(x,ph),exSets(x,ph),num(x.inc),x.ss,wi.pi,x.id))};
       S.draft.start=null;S.draft.pausedMs=0;S.draft.pausedAt=null;S.draft.est=Math.round(estRaw(b.dataset.express?expressOf(pwById(wi.pi,w.id),wi.pi):pwById(wi.pi,w.id),ph)*10)/10;
       addWarmups(S.draft.exercises[0],b.dataset.express?1:wuCount(ph));
       saveDraft();render();window.scrollTo(0,0);break}
@@ -953,8 +988,8 @@ document.addEventListener("click",ev=>{
       const exs=D.exercises.map(e=>({exId:e.exId,name:e.name,kind:e.kind,reps:e.reps||"",sets:e.sets.filter(s=>s.done).map(s=>s.wu?{w:num(s.w),r:num(s.r),wu:true}:{w:num(s.w),r:num(s.r)})})).filter(e=>e.sets.length);
       if(!exs.length){toast("Check off at least one set first");return}
       if(!D.start)beginDraft(D);
-      let est=D.est;if(!est){const ph=p.phases[D.phase],w=ph&&(ph.workouts||[]).find(x=>x.id===D.dayId);est=w?Math.round(estRaw(w,ph)*10)/10:0}
-      const s={id:D.id,dayId:D.dayId,dayName:D.dayName,express:!!D.express,start:D.start,end:new Date().toISOString(),activeSec:Math.round(activeSec(D)),est,week:D.week,phase:D.phase,phaseName:D.phaseName,exercises:exs};
+      let est=D.est;if(!est){const ph=p.phases[D.phase],w=ph&&pwById(D.phase,D.dayId,D.round||0);est=w?Math.round(estRaw(w,ph)*10)/10:0}
+      const s={id:D.id,dayId:D.dayId,dayName:D.dayName,round:D.round||0,express:!!D.express,start:D.start,end:new Date().toISOString(),activeSec:Math.round(activeSec(D)),est,week:D.week,phase:D.phase,phaseName:D.phaseName,exercises:exs};
       const before=new Set(computeBadges(S.sessions).filter(x=>x.earned).map(x=>x.id));S.sessions.push(s);saveSession(s);S.draft=null;saveDraft();S.restStart=null;wakeOff();tick();
       render();window.scrollTo(0,0);const prs=prsIn(s),nb=computeBadges(S.sessions).filter(x=>x.earned&&!before.has(x.id));
       if(prs.length||nb.length)celebrate(nb.length?(nb.length>1?nb.length+" new badges!":"New badge!"):"New personal best!",nb.map(x=>`${x.icon} <b>${esc(x.name)}</b> — ${esc(x.desc)}`).concat(prs.length?["🏆 New best: "+esc(prs.join(", "))]:[]));
@@ -996,10 +1031,11 @@ document.addEventListener("click",ev=>{
     case"wk+":shiftWeek(1);render();break;
     case"wk-":shiftWeek(-1);render();break;
     case"ep":S.ep=+b.dataset.i;render();break;
-    case"addphase":{const last=p.phases[p.phases.length-1];const nw=JSON.parse(JSON.stringify(last.workouts||[]));nw.forEach(w=>w.exercises.forEach(e=>e.id=uid()));p.phases.push({name:"Phase "+(p.phases.length+1),weeks:3,sets:3,reps:"8-10",rest:90,note:"",workouts:nw});}saveProgram();render();break;
+    case"er":S.er=+b.dataset.i;render();break;
+    case"addphase":{const last=p.phases[p.phases.length-1];const nw=JSON.parse(JSON.stringify(last.workouts||[]));nw.forEach(w=>w.exercises.forEach(e=>e.id=uid()));const nw2=JSON.parse(JSON.stringify(last.workouts2||last.workouts||[]));nw2.forEach(w=>w.exercises.forEach(e=>e.id=uid()));p.phases.push({name:"Phase "+(p.phases.length+1),weeks:3,sets:3,reps:"8-10",rest:90,note:"",workouts:nw,workouts2:nw2});}saveProgram();render();break;
     case"rmphase":p.phases.splice(+b.dataset.i,1);S.ep=null;saveProgram();render();break;
-    case"addday":{const id=uid();p.workouts.push({id,name:"Workout "+(p.workouts.length+1)});p.phases.forEach((x,i)=>pwById(i,id).exercises.push(ex("",5)));saveProgram();render();break}
-    case"rmday":{const di=+b.dataset.di;if(S.armed==="day"+di){const id=p.workouts[di].id;p.workouts.splice(di,1);p.phases.forEach(x=>{if(x.workouts)x.workouts=x.workouts.filter(w=>w.id!==id)});S.armed=null;saveProgram();render()}else arm("day"+di);break}
+    case"addday":{const id=uid();p.workouts.push({id,name:"Workout "+(p.workouts.length+1)});p.phases.forEach((x,i)=>{for(let r=0;r<nRounds();r++)pwById(i,id,r).exercises.push(ex("",5))});saveProgram();render();break}
+    case"rmday":{const di=+b.dataset.di;if(S.armed==="day"+di){const id=p.workouts[di].id;p.workouts.splice(di,1);p.phases.forEach(x=>{for(let r=0;r<nRounds();r++){const k=wkey(r);if(x[k])x[k]=x[k].filter(w=>w.id!==id)}});S.armed=null;saveProgram();render()}else arm("day"+di);break}
     case"addpex":pw(epi(),+b.dataset.di).exercises.push(ex("",5));saveProgram();render();
       {const ins=view.querySelectorAll(`[data-pf="name"][data-di="${b.dataset.di}"]`);if(ins.length)ins[ins.length-1].focus()}break;
     case"rmex":pw(epi(),+b.dataset.di).exercises.splice(+b.dataset.xi,1);saveProgram();render();break;
