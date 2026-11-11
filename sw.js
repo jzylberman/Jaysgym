@@ -1,6 +1,6 @@
 /* JaysGym service worker: works offline, prefers the newest app version when online.
    Bump VERSION whenever you deploy an update. */
-const VERSION = "jaysgym-2026-11-11f";
+const VERSION = "jaysgym-2026-11-11g";
 const ASSETS = ["./", "index.html", "manifest.webmanifest", "icons/icon-180.png", "icons/icon-192.png", "icons/icon-512.png"];
 const FONT_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com"];
 
@@ -29,7 +29,7 @@ self.addEventListener("fetch", e => {
   if (url.origin !== location.origin) return;
   /* app files: network first, fall back to the cached copy offline */
   e.respondWith(
-    fetch(req)
+    fetch(req, { cache: "no-cache" })   /* always revalidate with GitHub so updates show up right away */
       .then(res => { if (res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); } return res; })
       .catch(() => caches.match(req).then(hit => hit || caches.match("index.html")))
   );

@@ -1104,7 +1104,12 @@ S.draft=(cached&&cached.draft&&cached.draft.v===2)?cached.draft:null;
 if(cached&&cached.body&&Array.isArray(cached.body.entries))S.body={heightIn:cached.body.heightIn||null,entries:cached.body.entries};
 render();
 connect();
-if("serviceWorker" in navigator&&location.protocol.startsWith("http")){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+if("serviceWorker" in navigator&&location.protocol.startsWith("http")){
+  const hadSW=!!navigator.serviceWorker.controller;let reloaded=false;
+  /* when a new version takes over, reload once so you see it immediately (not mid-workout) */
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(hadSW&&!reloaded&&!S.draft){reloaded=true;location.reload()}});
+  window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{r.update().catch(()=>{});document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")r.update().catch(()=>{})})}).catch(()=>{})});
+}
 })();
 </script>
 </body>
